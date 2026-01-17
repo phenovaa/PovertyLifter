@@ -6,8 +6,8 @@ import java.sql.*; // later gebruiken voor MySQL
 public class PovertyLiftersGUI {
 
     // ==================== CONSTANTEN (APP SETTINGS) ====================
-    private static final int FRAME_WIDTH = 1200;
-    private static final int FRAME_HEIGHT = 1000;
+    private static final int FRAME_WIDTH = 750;
+    private static final int FRAME_HEIGHT = 850;
 
     // Session: alleen zolang app draait
     private static String currentUser = null;
@@ -260,7 +260,21 @@ public class PovertyLiftersGUI {
         // Optionele afbeelding
         try {
             ImageIcon icon = new ImageIcon("resources/Community-PNG.png");
-            Image img = icon.getImage().getScaledInstance(FRAME_WIDTH - 700, 500, Image.SCALE_SMOOTH);
+            Image original = icon.getImage();
+
+            int ow = icon.getIconWidth();
+            int oh = icon.getIconHeight();
+
+            int maxW = 300;  // <-- maak kleiner/groter
+            int maxH = 150;  // <-- maak kleiner/groter
+
+            double scale = Math.min((double) maxW / ow, (double) maxH / oh);
+
+            int newW = (int) (ow * scale);
+            int newH = (int) (oh * scale);
+
+            Image img = original.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+
             JLabel imageLabel = new JLabel(new ImageIcon(img));
             imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
