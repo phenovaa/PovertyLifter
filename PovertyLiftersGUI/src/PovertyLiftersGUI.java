@@ -18,6 +18,22 @@ public class PovertyLiftersGUI {
     private static final String LANG_AR = "AR";
     private static final String LANG_ZH = "ZH";
 
+    // Admin toegangscodes (simpel demo; later beter via DB/hash/ENV)
+    private static final String[] ADMIN_ACCESS_CODES = {
+            "hhs123",
+            "pandabeertje123",
+            "koekiemonster123"
+    };
+
+    private static boolean isValidAdminAccessCode(String code) {
+        if (code == null) return false;
+        code = code.trim();
+        for (String c : ADMIN_ACCESS_CODES) {
+            if (c.equals(code)) return true;
+        }
+        return false;
+    }
+
     // ==================== TOPIC DATA (ARRAYS) ====================
     // Vaste keys om teksten te vinden
     private static final String[] topicKeys = {"AZC", "LANGUAGE", "WORK", "HEALTHCARE", "FINANCE"};
@@ -959,6 +975,11 @@ public class PovertyLiftersGUI {
         title.setFont(new Font("Arial", Font.BOLD, 24));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // ✅ Toegangscode veld
+        JLabel codeLabel = centerLabel("Access code", 16);
+        JPasswordField codeField = new JPasswordField();
+        setFieldSize(codeField, 420, 40);
+
         JLabel userLabel = centerLabel("Username", 16);
         JTextField user = new JTextField();
         setFieldSize(user, 420, 40);
@@ -981,30 +1002,59 @@ public class PovertyLiftersGUI {
 
         form.add(title);
         form.add(Box.createVerticalStrut(25));
+
+        form.add(codeLabel);
+        form.add(Box.createVerticalStrut(6));
+        form.add(codeField);
+        form.add(Box.createVerticalStrut(14));
+
         form.add(userLabel);
         form.add(Box.createVerticalStrut(6));
         form.add(user);
         form.add(Box.createVerticalStrut(14));
+
         form.add(emailLabel);
         form.add(Box.createVerticalStrut(6));
         form.add(email);
         form.add(Box.createVerticalStrut(14));
+
         form.add(passLabel);
         form.add(Box.createVerticalStrut(6));
         form.add(pass);
         form.add(Box.createVerticalStrut(22));
+
         form.add(btn);
         form.add(Box.createVerticalStrut(12));
         form.add(msg);
 
         btn.addActionListener(e -> {
+            String accessCode = new String(codeField.getPassword()).trim();
+            String username = user.getText().trim();
+            String mail = email.getText().trim();
+            String password = new String(pass.getPassword()).trim();
+
+            if (accessCode.isEmpty() || username.isEmpty() || mail.isEmpty() || password.isEmpty()) {
+                msg.setText("Fill in everything.");
+                return;
+            }
+
+            // ✅ Check toegangscode (anders geen admin registratie)
+            if (!isValidAdminAccessCode(accessCode)) {
+                msg.setText("Invalid access code. Admin registration is not allowed.");
+                return;
+            }
+
             // TODO DB: INSERT INTO admins(username,email,password) VALUES (?,?,?)
             msg.setText("Admin registered (demo).");
+
+            // Optioneel: doorsturen na registratie
+            // openPage(frame, () -> showAdminLogin(lang));
         });
 
         frame.add(wrapper, BorderLayout.CENTER);
         frame.setVisible(true);
     }
+
 
     public static void showAdminLogin(String lang) {
         JFrame frame = createBaseFrame("Admin Login", lang);
